@@ -5,31 +5,9 @@ import fator_de_calibracao_cli as fact_cli
 import ui_fator_de_calibracao as fact_ui
 import logging
 
-# import sys
+import sys
 
-class Calibrator:
-
-    def __init__(self):
-
-        self.app = QApplication()
-        self.window = QMainWindow()
-        self.ui = fact_ui.Ui_MainWindow()
-
-        self.logger = logging.getLogger('Calibrator')
-
-        self.ui.setupUi(self.window)
-        self.extend_ui()
-
-        self.window.show()
-        self.app.exec()
-
-    def extend_ui(self):
-        self.dummy_elements: bool = False
-        ...
-
-    def connect_esp(self):
-        
-        ...
+logger = logging.getLogger(__name__)
 
 
 def extend_ui(ui):
@@ -53,7 +31,11 @@ def extend_ui(ui):
         while(com.check_connection() and sample_count < n_samples):
 
             # ui.display_status.text()
-            response = int(com.read_response())
+            try:
+                response = int(com.read_response())
+            except ValueError:
+                continue
+
             samples.append(response)
             sample_count+=1
             print(f"Sample {sample_count}: {response}")
@@ -116,14 +98,14 @@ def extend_ui(ui):
 
 if __name__ == '__main__':
 
-    # app = QApplication(sys.argv)
-    # window = QMainWindow()
+    app = QApplication(sys.argv)
+    window = QMainWindow()
+    
+    ui = fact_ui.Ui_MainWindow()
+    ui.setupUi(window)
+    extend_ui(ui)
+    
+    window.show()
+    app.exec()
 
-    # ui = fact_ui.Ui_MainWindow()
-    # ui.setupUi(window)
-    # extend_ui(ui)
-
-    # window.show()
-    # app.exec()
-
-    Calibrator()
+    # Calibrator()

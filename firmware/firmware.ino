@@ -13,7 +13,7 @@
 #include <LiquidCrystal_I2C.h>
 
 #include "Pressure.h"
-
+jjj
 // Definições de pinos e constantes
 #define LED_PIN 4     // Pino do LED
 #define CS_PIN 5      // Pino do cartão SD
