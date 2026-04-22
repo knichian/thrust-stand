@@ -80,7 +80,8 @@ def get_calibration_factor(samples: list[int], expected_weight: int):
     samples_amnt = len(samples)
     samples_avg = samples_sum/samples_amnt
 
-    calibration_factor = samples_avg/expected_weight
+    # calibration_factor = samples_avg/expected_weight
+    calibration_factor = (expected_weight/samples_avg)
 
     return calibration_factor
 

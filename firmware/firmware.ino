@@ -7,10 +7,10 @@
 #include <SPI.h>
 #include <Pushbutton.h>
 #include <BluetoothSerial.h>
-#include <esp_now.h>
-#include <WiFi.h>
+// #include <esp_now.h>
+// #include <WiFi.h>
 #include <Preferences.h>
-#include <LiquidCrystal_I2C.h>
+// #include <LiquidCrystal_I2C.h>
 
 #include "Pressure.h"
 
@@ -23,8 +23,8 @@
 #define CELULA_SCK_PIN 27 // Pino de clock da célula de carga
 #define PRESSURE_PIN 35   // Pino do sensor de pressão
 #define INTERVALO 100     // Precisão Leitura Dados milissegundos
-#define LCD_ROW 4 // Quantidade de linhas do LCD
-#define LCD_COL 20 // Quantidade de colunas do LCD 
+// #define LCD_ROW 4 // Quantidade de linhas do LCD
+// #define LCD_COL 20 // Quantidade de colunas do LCD 
 
 // Variáveis globais
 const float VinPressure = 5.0;    // Tensão que alimenta o sensor
@@ -55,7 +55,7 @@ typedef struct struct_message
 
 // Cria uma instância da estrutura e informações do par
 struct_message minhaMensagem;
-esp_now_peer_info_t peerInfo;
+// esp_now_peer_info_t peerInfo;
 
 // Instanciação de objetos
 Pushbutton button(BTN_PIN);                                                                                                  // Botão
@@ -64,7 +64,7 @@ RTC_DS3231 rtc;                                                                 
 HX711 escala;                                                                                                                // Célula de carga
 BluetoothSerial SerialBT;                                                                                                    // Bluetooth
 Preferences preferences;                                                                                                     // Preferências salvas
-LiquidCrystal_I2C LCD = LiquidCrystal_I2C(0x27, 20, 4); // Tela LCD 20x4
+// LiquidCrystal_I2C LCD = LiquidCrystal_I2C(0x27, 20, 4); // Tela LCD 20x4
 
 void setup()
 {
@@ -79,7 +79,7 @@ void setup()
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(BTN_PIN, INPUT);
   
-  setupInfoScreen();
+  // setupInfoScreen();
 
   // setupESPNow();
 
@@ -129,11 +129,11 @@ void loop()
             if (lastSpaceIndex != -1)
             {
               String factorStr = loadCommand.substring(lastSpaceIndex + 1);
-              float factor = factorStr.toFloat();
+              double factor = factorStr.toDouble();
               if (!isnan(factor))
               {
                 setLoadFactor(factor);
-                configurado = true; // Sai do loop
+                configurado = true; // Sai do loop                
               }
               else
               {
@@ -151,20 +151,20 @@ void loop()
 }
 
 // Configuração da tela de informacoes que vão aparecer no lcd
-void setupInfoScreen() {
-  LCD.init();
-  LCD.backlight();
-  LCD.setCursor(0, 0);
-  LCD.clear(): 
-  LCD.setCursor(0, 0);
-  LCD.print("kgf: ");
-  LCD.setCursor(0, 1); // Linha 1, coluna 0
-  LCD.print("Max kgf: ");
-  LCD.setCursor(0 , 2);
-  LCD.print("MPa: ");
-  LCD.setCursor(0, 3);
-  LCD.print("Max MPa: ");
-}
+// void setupInfoScreen() {
+//   LCD.init();
+//   LCD.backlight();
+//   LCD.setCursor(0, 0);
+//   LCD.clear();
+//   LCD.setCursor(0, 0);
+//   LCD.print("kgf: ");
+//   LCD.setCursor(0, 1); // Linha 1, coluna 0
+//   LCD.print("Max kgf: ");
+//   LCD.setCursor(0 , 2);
+//   LCD.print("MPa: ");
+//   LCD.setCursor(0, 3);
+//   LCD.print("Max MPa: ");
+// }
 
 // Configuração do fator de carga
 void setLoadFactor(float factor)
@@ -177,45 +177,45 @@ void setLoadFactor(float factor)
 }
 
 // Função de callback ESP-NOW
-void OnDataSent(const wifi_tx_info_t *tx_info, esp_now_send_status_t status)
-{
-  Serial.print("\r\nStatus do pacote ESP-NOW: ");
-  if (status == ESP_NOW_SEND_SUCCESS)
-  {
-    Serial.println("Entrega com Sucesso");
-  }
-  else
-  {
-    Serial.println("Falha na Entrega");
-  }
-}
+// void OnDataSent(const wifi_tx_info_t *tx_info, esp_now_send_status_t status)
+// {
+//   Serial.print("\r\nStatus do pacote ESP-NOW: ");
+//   if (status == ESP_NOW_SEND_SUCCESS)
+//   {
+//     Serial.println("Entrega com Sucesso");
+//   }
+//   else
+//   {
+//     Serial.println("Falha na Entrega");
+//   }
+// }
 
 // Função para inicializar o ESP-NOW
-void setupESPNow()
-{
-  WiFi.mode(WIFI_STA);
-  if (esp_now_init() != ESP_OK)
-  {
-    Serial.println("ERRO CRÍTICO: Falha ao inicializar o ESP-NOW.");
-    return; // Sai da função se a inicialização base falhar
-  }
+// void setupESPNow()
+// {
+//   WiFi.mode(WIFI_STA);
+//   if (esp_now_init() != ESP_OK)
+//   {
+//     Serial.println("ERRO CRÍTICO: Falha ao inicializar o ESP-NOW.");
+//     return; // Sai da função se a inicialização base falhar
+//   }
 
-  esp_now_register_send_cb(OnDataSent);
-  memcpy(peerInfo.peer_addr, enderecoReceptor, 6);
-  peerInfo.channel = 0;
-  peerInfo.encrypt = false;
+//   esp_now_register_send_cb(OnDataSent);
+//   memcpy(peerInfo.peer_addr, enderecoReceptor, 6);
+//   peerInfo.channel = 0;
+//   peerInfo.encrypt = false;
 
-  if (esp_now_add_peer(&peerInfo) != ESP_OK)
-  {
-    Serial.println("AVISO: Falha ao adicionar o par receptor. O ESP-NOW não transmitirá dados.");
-    espNowPeerReady = false;
-  }
-  else
-  {
-    Serial.println("ESP-NOW OK! Par receptor adicionado com sucesso.");
-    espNowPeerReady = true;
-  }
-}
+//   if (esp_now_add_peer(&peerInfo) != ESP_OK)
+//   {
+//     Serial.println("AVISO: Falha ao adicionar o par receptor. O ESP-NOW não transmitirá dados.");
+//     espNowPeerReady = false;
+//   }
+//   else
+//   {
+//     Serial.println("ESP-NOW OK! Par receptor adicionado com sucesso.");
+//     espNowPeerReady = true;
+//   }
+// }
 
 // Sinalização com o buzzer
 void buzzSignal(String signal)
@@ -333,30 +333,30 @@ bool setupHX711()
 // Formato: Tempo (ms), Empuxo (Kg), Pressão (MPa)
 void logData(unsigned long millis)
 {
-  float peso = escala.get_units();
+  double peso = escala.get_units();
   float pressao = pressureSensor.readMPa();
-  // printa os valores de peso e pressão no LCD (ajuste posições para 16x4)
-  // Atual (linha 0) e Maior (linha 1) para peso
-  LCD.setCursor(12, 0);
-  LCD.print("      ");               // limpa espaço
-  LCD.setCursor(12, 0);
-  LCD.print(String(peso, 2));       // peso com 2 casas
+  // // printa os valores de peso e pressão no LCD (ajuste posições para 16x4)
+  // // Atual (linha 0) e Maior (linha 1) para peso
+  // LCD.setCursor(12, 0);
+  // LCD.print("      ");               // limpa espaço
+  // LCD.setCursor(12, 0);
+  // LCD.print(String(peso, 2));       // peso com 2 casas
 
-  LCD.setCursor(12, 1);
-  LCD.print("      ");
-  LCD.setCursor(12, 1);
-  LCD.print(String(maxValues[0], 2)); // maior peso atual
+  // LCD.setCursor(12, 1);
+  // LCD.print("      ");
+  // LCD.setCursor(12, 1);
+  // LCD.print(String(maxValues[0], 2)); // maior peso atual
 
-  // Pressão Atual (linha 2) e Pressão Maior (linha 3)
-  LCD.setCursor(13, 2);
-  LCD.print("   ");
-  LCD.setCursor(13, 2);
-  LCD.print(String(pressao, 2));
+  // // Pressão Atual (linha 2) e Pressão Maior (linha 3)
+  // LCD.setCursor(13, 2);
+  // LCD.print("   ");
+  // LCD.setCursor(13, 2);
+  // LCD.print(String(pressao, 2));
 
-  LCD.setCursor(13, 3);
-  LCD.print("   ");
-  LCD.setCursor(13, 3);
-  LCD.print(String(maxValues[1], 2));
+  // LCD.setCursor(13, 3);
+  // LCD.print("   ");
+  // LCD.setCursor(13, 3);
+  // LCD.print(String(maxValues[1], 2));
 
   if (peso > maxValues[0])
   {
